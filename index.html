@@ -53,12 +53,125 @@
   <script type="text/babel">
     const { useState, useMemo } = React;
 
+    // --- ICONS ---
+    const Globe = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="2" y1="12" x2="22" y2="12"></line>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+      </svg>
+    );
+
+    // --- I18N DICTIONARY ---
+    const TRANSLATIONS = {
+      es: {
+        title: "Transpositor Topológico",
+        subtitle: "Motor de conservación de frecuencia absoluta. Aplica vectores espaciales de fricción cero.",
+        createdBy: "Creado por",
+        inputMatrix: "Matriz de Entrada",
+        sourceClef: "Clave de Origen",
+        targetClef: "Clave de Destino",
+        opticalCompression: "Compresión Óptica (Destino)",
+        neutral: "Neutral (Loco)",
+        ottavaAlta: "8va (Ottava Alta)",
+        ottavaBassa: "8vb (Ottava Bassa)",
+        keySignatureState: "Estado de Armadura",
+        sharps: "♯ Sostenidos",
+        flats: "♭ Bemoles",
+        projectedTonality: "Tonalidad Proyectada",
+        nodes: "Nodos (Notas)",
+        formatHint: "Formato: [Nota][Alteración][Octava].",
+        noSpaces: "Sin espacios entre nota y alteración.",
+        naturalOp: "Operador Becuadro (♮):",
+        naturalDesc: "Usa ",
+        naturalDesc2: " junto a la nota.",
+        naturalEx: "Ejemplo: Escribir ",
+        naturalEx2: " dibuja becuadro en Re.",
+        originalTopology: "Topología Original",
+        transposedTopology: "Topología Transpuesta",
+        systemDiagnostics: "Diagnóstico del Sistema",
+        conservationState: "Estado de conservación:",
+        absolute: "100% (Absoluto)",
+        harmonicFreq: "Frecuencia Armónica Global:",
+        baseVector: "Vector Espacial (Base):",
+        levels: "niveles",
+        opticalInjected: "Compresión Óptica inyectada:",
+        effectiveVector: "Vector Topológico Efectivo:",
+        acousticEcosystem: "Ecosistema Acústico: Taxonomía de Claves",
+        highFreq: "Alta Frecuencia.",
+        trebleDesc: "Ancla el G4 (392 Hz). Lente topológico optimizado para frecuencias superiores.",
+        primaryResonators: "Resonadores Primarios:",
+        trebleInst: "Violín, Flauta, Oboe, Trompeta, Clarinete, Piano (Mano Derecha), Guitarra.",
+        midFreq: "Frecuencia Media.",
+        altoDesc: "Ancla el C4 (261 Hz) en el centro exacto de la red. Evita colapsar en líneas adicionales.",
+        altoInst: "Viola, Viola da gamba, Mandola, Trombón Alto.",
+        acuteGraveTrans: "Transición Aguda/Grave.",
+        tenorDesc: "Sube el ancla C4 a la 4ta línea. Usado para leer registros agudos de instrumentos masivos.",
+        tenorInst: "Violonchelo (registro alto), Fagot (registro alto), Trombón Tenor.",
+        lowFreq: "Baja Frecuencia.",
+        bassDesc: "Ancla el F3 (174 Hz). Lente topológico desplazado hacia las profundidades para capturar ondas largas.",
+        bassInst: "Contrabajo, Violonchelo, Fagot, Tuba, Timbales, Piano (Mano Izquierda).",
+        supportProject: "Apoya el Proyecto",
+        scanDonate: "Escanea o haz clic para donar vía PayPal"
+      },
+      en: {
+        title: "Topological Transposer",
+        subtitle: "Absolute frequency conservation engine. Applies zero-friction spatial vectors.",
+        createdBy: "Created by",
+        inputMatrix: "Input Matrix",
+        sourceClef: "Source Clef",
+        targetClef: "Target Clef",
+        opticalCompression: "Optical Compression (Target)",
+        neutral: "Neutral (Loco)",
+        ottavaAlta: "8va (Ottava Alta)",
+        ottavaBassa: "8vb (Ottava Bassa)",
+        keySignatureState: "Key Signature State",
+        sharps: "♯ Sharps",
+        flats: "♭ Flats",
+        projectedTonality: "Projected Tonality",
+        nodes: "Nodes (Notes)",
+        formatHint: "Format: [Note][Accidental][Octave].",
+        noSpaces: "No spaces between note and accidental.",
+        naturalOp: "Natural Operator (♮):",
+        naturalDesc: "Use ",
+        naturalDesc2: " next to the note.",
+        naturalEx: "Example: Typing ",
+        naturalEx2: " draws a natural on D.",
+        originalTopology: "Original Topology",
+        transposedTopology: "Transposed Topology",
+        systemDiagnostics: "System Diagnostics",
+        conservationState: "Conservation state:",
+        absolute: "100% (Absolute)",
+        harmonicFreq: "Global Harmonic Frequency:",
+        baseVector: "Spatial Vector (Base):",
+        levels: "levels",
+        opticalInjected: "Injected Optical Compression:",
+        effectiveVector: "Effective Topological Vector:",
+        acousticEcosystem: "Acoustic Ecosystem: Clef Taxonomy",
+        highFreq: "High Frequency.",
+        trebleDesc: "Anchors G4 (392 Hz). Topological lens optimized for higher frequencies.",
+        primaryResonators: "Primary Resonators:",
+        trebleInst: "Violin, Flute, Oboe, Trumpet, Clarinet, Piano (Right Hand), Guitar.",
+        midFreq: "Mid Frequency.",
+        altoDesc: "Anchors C4 (261 Hz) at the exact center of the grid. Avoids collapsing into ledger lines.",
+        altoInst: "Viola, Viola da gamba, Mandola, Alto Trombone.",
+        acuteGraveTrans: "Acute/Grave Transition.",
+        tenorDesc: "Raises the C4 anchor to the 4th line. Used to read high registers of massive instruments.",
+        tenorInst: "Cello (high register), Bassoon (high register), Tenor Trombone.",
+        lowFreq: "Low Frequency.",
+        bassDesc: "Anchors F3 (174 Hz). Topological lens shifted to the depths to capture long waves.",
+        bassInst: "Double Bass, Cello, Bassoon, Tuba, Timpani, Piano (Left Hand).",
+        supportProject: "Support the Project",
+        scanDonate: "Scan or click to donate via PayPal"
+      }
+    };
+
     // --- MOTOR TOPOLÓGICO: DEFINICIÓN DE CONSTANTES ---
     const CLEF_OFFSETS = {
-      treble: { name: 'Sol (Treble)', index: 6, symbol: '𝄞', anchorY: 70, dy: -18, fontSize: 55 },
-      alto: { name: 'Do en 3ra (Alto)', index: 0, symbol: '𝄡', anchorY: 60, dy: 0, fontSize: 45 },
-      tenor: { name: 'Do en 4ta (Tenor)', index: -2, symbol: '𝄡', anchorY: 50, dy: 0, fontSize: 45 },
-      bass: { name: 'Fa (Bass)', index: -6, symbol: '𝄢', anchorY: 50, dy: 6, fontSize: 50 }
+      treble: { nameEs: 'Sol (Treble)', nameEn: 'G (Treble)', index: 6, symbol: '𝄞', anchorY: 70, dy: -18, fontSize: 55 },
+      alto: { nameEs: 'Do en 3ra (Alto)', nameEn: 'C 3rd (Alto)', index: 0, symbol: '𝄡', anchorY: 60, dy: 0, fontSize: 45 },
+      tenor: { nameEs: 'Do en 4ta (Tenor)', nameEn: 'C 4th (Tenor)', index: -2, symbol: '𝄡', anchorY: 50, dy: 0, fontSize: 45 },
+      bass: { nameEs: 'Fa (Bass)', nameEn: 'F (Bass)', index: -6, symbol: '𝄢', anchorY: 50, dy: 6, fontSize: 50 }
     };
 
     const STEP_VALUES = { 'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6 };
@@ -259,12 +372,15 @@
     };
 
     function App() {
+      const [lang, setLang] = useState('es');
       const [sourceClef, setSourceClef] = useState('bass');
       const [targetClef, setTargetClef] = useState('alto');
       const [keySigType, setKeySigType] = useState('sharp');
       const [keySigCount, setKeySigCount] = useState(4);
       const [inputText, setInputText] = useState('G#2 A2 B2 Dn3 E3');
       const [targetOctaveShift, setTargetOctaveShift] = useState('none');
+
+      const t = (key) => TRANSLATIONS[lang][key] || key;
 
       const parsedNotes = useMemo(() => parseNotesInput(inputText), [inputText]);
       
@@ -273,77 +389,90 @@
       const effectiveVector = baseVector + opticalShiftValue;
 
       const activeScale = SCALE_DICTIONARY[keySigType][Math.min(keySigCount, 7)];
+      
+      // Adaptación de nombres de escala según idioma
+      const scaleMajorName = lang === 'es' ? activeScale.major : activeScale.major.replace('Mayor', 'Major');
+      const scaleMinorName = lang === 'es' ? activeScale.minor : activeScale.minor.replace('menor', 'minor');
 
       return (
         <div className="min-h-screen bg-black text-gray-200 p-6 font-sans">
           <div className="max-w-5xl mx-auto space-y-8">
             
-            {/* Header: Identidad Acoplada */}
-            <header className="border-b border-gray-800 pb-4">
+            {/* Header: Identidad Acoplada & Language Toggle */}
+            <header className="border-b border-gray-800 pb-4 flex flex-col md:flex-row md:items-start justify-between gap-4">
               <div className="flex flex-col items-start">
                 <div className="flex items-center gap-4 mb-2">
-                  <div className="h-16 w-16 rounded-2xl overflow-hidden shadow-lg border border-gray-700 bg-gray-900">
+                  <div className="h-16 w-16 rounded-2xl overflow-hidden shadow-lg border border-gray-700 bg-gray-900 flex-shrink-0">
                     <img src="logo.jpg" alt="Transpositor Topológico" className="h-full w-full object-cover" onError={(e) => e.target.src='https://ui-avatars.com/api/?name=Transpositor+Topologico&background=3b82f6&color=fff&size=128'} />
                   </div>
                   <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white">Transpositor Topológico</h1>
-                    <p className="text-gray-400 mt-2 text-sm">
-                      Motor de conservación de frecuencia absoluta. Aplica vectores espaciales de fricción cero.
+                    <h1 className="text-3xl font-bold tracking-tight text-white">{t('title')}</h1>
+                    <p className="text-gray-400 mt-2 text-sm max-w-xl">
+                      {t('subtitle')}
                     </p>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1 font-mono pl-1">Creado por Carlos David <a href="https://cdcruzher.github.io/cdcruzher/" target="_blank" className="text-blue-500 hover:text-blue-400 font-bold transition-colors">@cdcruzher</a></p>
+                <p className="text-xs text-gray-500 mt-1 font-mono pl-1">{t('createdBy')} Carlos David <a href="https://cdcruzher.github.io/cdcruzher/" target="_blank" className="text-blue-500 hover:text-blue-400 font-bold transition-colors">@cdcruzher</a></p>
               </div>
+
+              {/* Language Toggle Button */}
+              <button 
+                onClick={() => setLang(lang === 'en' ? 'es' : 'en')}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-700 bg-gray-900/50 hover:bg-gray-800 text-xs font-bold text-gray-400 hover:text-white transition-colors flex-shrink-0 mt-2 md:mt-0"
+              >
+                <Globe size={14} />
+                <span>{lang === 'en' ? 'ES' : 'EN'}</span>
+              </button>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="bg-gray-900/50 border border-gray-800 p-6 rounded-xl space-y-6">
-                <h2 className="text-lg font-semibold text-white uppercase tracking-wider text-sm">Matriz de Entrada</h2>
+                <h2 className="text-lg font-semibold text-white uppercase tracking-wider text-sm">{t('inputMatrix')}</h2>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs text-gray-500 uppercase mb-1">Clave de Origen</label>
+                    <label className="block text-xs text-gray-500 uppercase mb-1">{t('sourceClef')}</label>
                     <select className="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white outline-none focus:border-blue-500 transition-colors" value={sourceClef} onChange={(e) => setSourceClef(e.target.value)}>
-                      {Object.entries(CLEF_OFFSETS).map(([k, v]) => <option key={k} value={k}>{v.name}</option>)}
+                      {Object.entries(CLEF_OFFSETS).map(([k, v]) => <option key={k} value={k}>{lang === 'en' ? v.nameEn : v.nameEs}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 uppercase mb-1">Clave de Destino</label>
+                    <label className="block text-xs text-gray-500 uppercase mb-1">{t('targetClef')}</label>
                     <select className="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white outline-none focus:border-blue-500 transition-colors" value={targetClef} onChange={(e) => setTargetClef(e.target.value)}>
-                      {Object.entries(CLEF_OFFSETS).map(([k, v]) => <option key={k} value={k}>{v.name}</option>)}
+                      {Object.entries(CLEF_OFFSETS).map(([k, v]) => <option key={k} value={k}>{lang === 'en' ? v.nameEn : v.nameEs}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-amber-500/80 uppercase mb-1 font-bold">Compresión Óptica (Destino)</label>
+                    <label className="block text-xs text-amber-500/80 uppercase mb-1 font-bold">{t('opticalCompression')}</label>
                     <select className="w-full bg-gray-800 border border-amber-700/50 rounded p-2 text-white outline-none focus:border-amber-500 transition-colors" value={targetOctaveShift} onChange={(e) => setTargetOctaveShift(e.target.value)}>
-                      <option value="none">Neutral (Loco)</option>
-                      <option value="8va">8va (Ottava Alta)</option>
-                      <option value="8vb">8vb (Ottava Bassa)</option>
+                      <option value="none">{t('neutral')}</option>
+                      <option value="8va">{t('ottavaAlta')}</option>
+                      <option value="8vb">{t('ottavaBassa')}</option>
                     </select>
                   </div>
                   <div className="bg-gray-800/80 p-3 rounded-lg border border-gray-700">
-                    <label className="block text-xs text-gray-400 uppercase mb-2">Estado de Armadura</label>
+                    <label className="block text-xs text-gray-400 uppercase mb-2">{t('keySignatureState')}</label>
                     <div className="flex gap-2 mb-3">
-                      <button className={`flex-1 py-1.5 rounded text-sm font-bold transition-colors ${keySigType === 'sharp' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-500 hover:bg-gray-800'}`} onClick={() => setKeySigType('sharp')}>♯ Sostenidos</button>
-                      <button className={`flex-1 py-1.5 rounded text-sm font-bold transition-colors ${keySigType === 'flat' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-500 hover:bg-gray-800'}`} onClick={() => setKeySigType('flat')}>♭ Bemoles</button>
+                      <button className={`flex-1 py-1.5 rounded text-sm font-bold transition-colors ${keySigType === 'sharp' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-500 hover:bg-gray-800'}`} onClick={() => setKeySigType('sharp')}>{t('sharps')}</button>
+                      <button className={`flex-1 py-1.5 rounded text-sm font-bold transition-colors ${keySigType === 'flat' ? 'bg-blue-600 text-white' : 'bg-gray-900 text-gray-500 hover:bg-gray-800'}`} onClick={() => setKeySigType('flat')}>{t('flats')}</button>
                     </div>
                     <div className="flex items-center gap-3">
                       <input type="number" min="0" max="7" className="w-20 bg-gray-900 border border-gray-700 rounded p-2 text-white outline-none focus:border-blue-500 transition-colors text-center" value={keySigCount} onChange={(e) => setKeySigCount(parseInt(e.target.value) || 0)} />
                       <div className="flex-1 text-right">
-                        <span className="block text-xs text-gray-500 uppercase">Tonalidad Proyectada</span>
-                        <span className="block text-sm font-bold text-green-400">{activeScale.major}</span>
-                        <span className="block text-xs text-gray-400 border-t border-gray-700 mt-0.5 pt-0.5">{activeScale.minor}</span>
+                        <span className="block text-xs text-gray-500 uppercase">{t('projectedTonality')}</span>
+                        <span className="block text-sm font-bold text-green-400">{scaleMajorName}</span>
+                        <span className="block text-xs text-gray-400 border-t border-gray-700 mt-0.5 pt-0.5">{scaleMinorName}</span>
                       </div>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 uppercase mb-1">Nodos (Notas)</label>
+                    <label className="block text-xs text-gray-500 uppercase mb-1">{t('nodes')}</label>
                     <input type="text" className="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white font-mono text-sm outline-none focus:border-blue-500 transition-colors" value={inputText} onChange={(e) => setInputText(e.target.value)} placeholder="Ej: G#2 A B2 Dn3 E3" />
                     <div className="mt-2 space-y-2">
-                      <p className="text-xs text-gray-500 leading-tight">Formato: [Nota][Alteración][Octava]. <span className="text-amber-500">Sin espacios entre nota y alteración.</span></p>
+                      <p className="text-xs text-gray-500 leading-tight">{t('formatHint')} <span className="text-amber-500">{t('noSpaces')}</span></p>
                       <div className="bg-blue-900/30 border border-blue-800/50 p-2.5 rounded-md">
                         <p className="text-xs text-blue-200 leading-relaxed">
-                          <span className="font-bold text-blue-400">💡 Operador Becuadro (♮):</span> Usa <code className="bg-black/80 text-white px-1.5 py-0.5 rounded font-mono">n</code> junto a la nota. <br/>
-                          <span className="text-blue-400/80 italic">Ejemplo: Escribir <code className="bg-black/50 px-1 rounded">Dn3</code> dibuja becuadro en Re.</span>
+                          <span className="font-bold text-blue-400">💡 {t('naturalOp')}</span> {t('naturalDesc')} <code className="bg-black/80 text-white px-1.5 py-0.5 rounded font-mono">n</code>{t('naturalDesc2')} <br/>
+                          <span className="text-blue-400/80 italic">{t('naturalEx')}<code className="bg-black/50 px-1 rounded">Dn3</code> {t('naturalEx2')}</span>
                         </p>
                       </div>
                     </div>
@@ -354,86 +483,86 @@
               <div className="lg:col-span-2 space-y-6">
                 <div>
                   <h3 className="text-sm font-semibold text-gray-400 mb-2 flex items-center">
-                    <span className="w-2 h-2 rounded-full bg-red-500 mr-2"></span> Topología Original ({CLEF_OFFSETS[sourceClef].name})
+                    <span className="w-2 h-2 rounded-full bg-red-500 mr-2"></span> {t('originalTopology')} ({lang === 'en' ? CLEF_OFFSETS[sourceClef].nameEn : CLEF_OFFSETS[sourceClef].nameEs})
                   </h3>
                   <Pentagrama clefKey={sourceClef} notes={parsedNotes} keySignatureCount={keySigCount} keySignatureType={keySigType} octaveShift="none" />
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-gray-400 mb-2 flex items-center">
-                    <span className="w-2 h-2 rounded-full bg-green-500 mr-2"></span> Topología Transpuesta ({CLEF_OFFSETS[targetClef].name})
+                    <span className="w-2 h-2 rounded-full bg-green-500 mr-2"></span> {t('transposedTopology')} ({lang === 'en' ? CLEF_OFFSETS[targetClef].nameEn : CLEF_OFFSETS[targetClef].nameEs})
                   </h3>
                   <Pentagrama clefKey={targetClef} notes={parsedNotes} keySignatureCount={keySigCount} keySignatureType={keySigType} octaveShift={targetOctaveShift} />
                 </div>
                 <div className="bg-blue-900/20 border border-blue-900/50 rounded-lg p-4 mt-6">
-                  <h4 className="text-blue-400 text-xs uppercase tracking-wider font-bold mb-2">Diagnóstico del Sistema</h4>
+                  <h4 className="text-blue-400 text-xs uppercase tracking-wider font-bold mb-2">{t('systemDiagnostics')}</h4>
                   <ul className="text-sm text-blue-200/80 space-y-1 font-mono">
-                    <li>&gt; Estado de conservación: <span className="text-green-400">100% (Absoluto)</span></li>
-                    <li>&gt; Frecuencia Armónica: <span className="text-white font-bold">{activeScale.major}</span> / <span className="text-gray-400">{activeScale.minor}</span></li>
-                    <li>&gt; Vector Espacial (Base): <span className="text-gray-400 ml-2">{baseVector > 0 ? `+${baseVector}` : baseVector} niveles</span></li>
-                    {targetOctaveShift !== 'none' && <li>&gt; Compresión Óptica inyectada: <span className="text-amber-400 ml-2">{opticalShiftValue > 0 ? `+${opticalShiftValue}` : opticalShiftValue} niveles ({targetOctaveShift})</span></li>}
-                    <li className="pt-2 border-t border-blue-900/50 mt-2">&gt; Vector Topológico Efectivo: <span className="text-white ml-2 font-bold text-base">{effectiveVector > 0 ? `+${effectiveVector}` : effectiveVector} niveles</span></li>
+                    <li>&gt; {t('conservationState')} <span className="text-green-400">{t('absolute')}</span></li>
+                    <li>&gt; {t('harmonicFreq')} <span className="text-white font-bold">{scaleMajorName}</span> / <span className="text-gray-400">{scaleMinorName}</span></li>
+                    <li>&gt; {t('baseVector')} <span className="text-gray-400 ml-2">{baseVector > 0 ? `+${baseVector}` : baseVector} {t('levels')}</span></li>
+                    {targetOctaveShift !== 'none' && <li>&gt; {t('opticalInjected')} <span className="text-amber-400 ml-2">{opticalShiftValue > 0 ? `+${opticalShiftValue}` : opticalShiftValue} {t('levels')} ({targetOctaveShift})</span></li>}
+                    <li className="pt-2 border-t border-blue-900/50 mt-2">&gt; {t('effectiveVector')} <span className="text-white ml-2 font-bold text-base">{effectiveVector > 0 ? `+${effectiveVector}` : effectiveVector} {t('levels')}</span></li>
                   </ul>
                 </div>
               </div>
             </div>
 
             <div className="bg-gray-900/30 border border-gray-800 rounded-xl p-6 mt-8">
-              <h2 className="text-xl font-bold text-white mb-6 border-b border-gray-800 pb-2">Ecosistema Acústico: Taxonomía de Claves</h2>
+              <h2 className="text-xl font-bold text-white mb-6 border-b border-gray-800 pb-2">{t('acousticEcosystem')}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 
                 <div className="bg-gray-800/50 border border-gray-700/50 p-4 rounded-lg flex flex-col">
                   <div className="flex items-center mb-3">
                     <span className="music-symbol text-4xl text-gray-400 mr-3">𝄞</span>
-                    <h3 className="text-md font-bold text-white">Sol (Treble)</h3>
+                    <h3 className="text-md font-bold text-white">{lang === 'en' ? CLEF_OFFSETS.treble.nameEn : CLEF_OFFSETS.treble.nameEs}</h3>
                   </div>
                   <p className="text-xs text-gray-400 mb-3 flex-grow">
-                    <strong className="text-gray-300">Alta Frecuencia.</strong> Ancla el G4 (392 Hz). Lente topológico optimizado para frecuencias superiores.
+                    <strong className="text-gray-300">{t('highFreq')}</strong> {t('trebleDesc')}
                   </p>
                   <div className="bg-black/40 p-2 rounded border border-gray-700/50 text-xs text-blue-300">
-                    <span className="font-bold block mb-1 text-gray-500 uppercase tracking-wider text-[10px]">Resonadores Primarios:</span>
-                    Violín, Flauta, Oboe, Trompeta, Clarinete, Piano (Mano Derecha), Guitarra.
+                    <span className="font-bold block mb-1 text-gray-500 uppercase tracking-wider text-[10px]">{t('primaryResonators')}</span>
+                    {t('trebleInst')}
                   </div>
                 </div>
 
                 <div className="bg-gray-800/50 border border-gray-700/50 p-4 rounded-lg flex flex-col">
                   <div className="flex items-center mb-3">
                     <span className="music-symbol text-4xl text-gray-400 mr-3">𝄡</span>
-                    <h3 className="text-md font-bold text-white">Do en 3ra (Alto)</h3>
+                    <h3 className="text-md font-bold text-white">{lang === 'en' ? CLEF_OFFSETS.alto.nameEn : CLEF_OFFSETS.alto.nameEs}</h3>
                   </div>
                   <p className="text-xs text-gray-400 mb-3 flex-grow">
-                    <strong className="text-gray-300">Frecuencia Media.</strong> Ancla el C4 (261 Hz) en el centro exacto de la red. Evita colapsar en líneas adicionales.
+                    <strong className="text-gray-300">{t('midFreq')}</strong> {t('altoDesc')}
                   </p>
                   <div className="bg-black/40 p-2 rounded border border-gray-700/50 text-xs text-amber-300">
-                    <span className="font-bold block mb-1 text-gray-500 uppercase tracking-wider text-[10px]">Resonadores Primarios:</span>
-                    Viola, Viola da gamba, Mandola, Trombón Alto. 
+                    <span className="font-bold block mb-1 text-gray-500 uppercase tracking-wider text-[10px]">{t('primaryResonators')}</span>
+                    {t('altoInst')}
                   </div>
                 </div>
 
                 <div className="bg-gray-800/50 border border-gray-700/50 p-4 rounded-lg flex flex-col">
                   <div className="flex items-center mb-3">
                     <span className="music-symbol text-4xl text-gray-400 mr-3">𝄡</span>
-                    <h3 className="text-md font-bold text-white">Do en 4ta (Tenor)</h3>
+                    <h3 className="text-md font-bold text-white">{lang === 'en' ? CLEF_OFFSETS.tenor.nameEn : CLEF_OFFSETS.tenor.nameEs}</h3>
                   </div>
                   <p className="text-xs text-gray-400 mb-3 flex-grow">
-                    <strong className="text-gray-300">Transición Aguda/Grave.</strong> Sube el ancla C4 a la 4ta línea. Usado para leer registros agudos de instrumentos masivos.
+                    <strong className="text-gray-300">{t('acuteGraveTrans')}</strong> {t('tenorDesc')}
                   </p>
                   <div className="bg-black/40 p-2 rounded border border-gray-700/50 text-xs text-green-300">
-                    <span className="font-bold block mb-1 text-gray-500 uppercase tracking-wider text-[10px]">Resonadores Primarios:</span>
-                    Violonchelo (registro alto), Fagot (registro alto), Trombón Tenor.
+                    <span className="font-bold block mb-1 text-gray-500 uppercase tracking-wider text-[10px]">{t('primaryResonators')}</span>
+                    {t('tenorInst')}
                   </div>
                 </div>
 
                 <div className="bg-gray-800/50 border border-gray-700/50 p-4 rounded-lg flex flex-col">
                   <div className="flex items-center mb-3">
                     <span className="music-symbol text-4xl text-gray-400 mr-3">𝄢</span>
-                    <h3 className="text-md font-bold text-white">Fa (Bass)</h3>
+                    <h3 className="text-md font-bold text-white">{lang === 'en' ? CLEF_OFFSETS.bass.nameEn : CLEF_OFFSETS.bass.nameEs}</h3>
                   </div>
                   <p className="text-xs text-gray-400 mb-3 flex-grow">
-                    <strong className="text-gray-300">Baja Frecuencia.</strong> Ancla el F3 (174 Hz). Lente topológico desplazado hacia las profundidades para capturar ondas largas.
+                    <strong className="text-gray-300">{t('lowFreq')}</strong> {t('bassDesc')}
                   </p>
                   <div className="bg-black/40 p-2 rounded border border-gray-700/50 text-xs text-purple-300">
-                    <span className="font-bold block mb-1 text-gray-500 uppercase tracking-wider text-[10px]">Resonadores Primarios:</span>
-                    Contrabajo, Violonchelo, Fagot, Tuba, Timbales, Piano (Mano Izquierda).
+                    <span className="font-bold block mb-1 text-gray-500 uppercase tracking-wider text-[10px]">{t('primaryResonators')}</span>
+                    {t('bassInst')}
                   </div>
                 </div>
 
@@ -442,11 +571,11 @@
 
             {/* Footer: Nodo de Retroalimentación y Apoyo */}
             <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col items-center pb-8">
-              <p className="text-xs text-gray-500 mb-4 uppercase tracking-wider font-semibold">Apoya el Proyecto</p>
+              <p className="text-xs text-gray-500 mb-4 uppercase tracking-wider font-semibold">{t('supportProject')}</p>
               <a href="https://www.paypal.com/donate/?business=6EN68NHUTM2KQ&no_recurring=0&item_name=Thanks+for+your+support+Amigo%21&currency_code=USD" target="_blank" className="block w-32 h-32 bg-gray-900 p-2 rounded-xl border border-gray-700 hover:shadow-lg hover:shadow-blue-900/20 hover:scale-105 transition-all cursor-pointer">
                 <img src="qrcode.jpg" alt="Donate" className="w-full h-full object-contain rounded-lg" onError={(e) => e.target.src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https%3A%2F%2Fwww.paypal.com%2Fdonate%2F%3Fbusiness%3D6EN68NHUTM2KQ%26no_recurring%3D0%26item_name%3DThanks%2Bfor%2Byour%2Bsupport%2BAmigo%21%26currency_code%3DUSD&color=ffffff&bgcolor=111827'} />
               </a>
-              <p className="text-[10px] text-gray-500 mt-3 text-center">Escanea o haz clic para donar vía PayPal</p>
+              <p className="text-[10px] text-gray-500 mt-3 text-center">{t('scanDonate')}</p>
             </div>
 
           </div>
